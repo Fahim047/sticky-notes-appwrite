@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState } from 'react';
 import TrashIcon from '../icons/TrashIcon';
-import { autoGrow, setNewOffset, setZIndex } from '../utils';
+import { autoGrow, bodyParser, setNewOffset, setZIndex } from '../utils';
 
 const NoteCard = ({ note }) => {
-	const body = JSON.parse(note.body);
+	const body = bodyParser(note.body);
 	const colors = JSON.parse(note.colors);
 
 	const [position, setPosition] = useState(JSON.parse(note.position));
