@@ -75,3 +75,8 @@ textarea:focus {
 	align-items: center;
 	gap: 5px;
 }
+button {
+	cursor: pointer;
+	border: none;
+	background: none;
+}

@@ -1,19 +1,18 @@
 import { useRef, useEffect, useState } from 'react';
-import TrashIcon from '../icons/TrashIcon';
 import { autoGrow, bodyParser, setNewOffset, setZIndex } from '../utils';
 import { db } from '../appwrite/databases';
 import Spinner from '../icons/Spinner';
+import DeleteButton from './DeleteButton';
 
-const NoteCard = ({ note }) => {
+const NoteCard = ({ note, setNotes }) => {
 	const [saving, setSaving] = useState(false);
 	const keyUpTimer = useRef(null);
-	const body = bodyParser(note.body);
-	const colors = JSON.parse(note.colors);
-
 	const [position, setPosition] = useState(JSON.parse(note.position));
 	const cardRef = useRef(null);
 	const textAreaRef = useRef(null);
 
+	const body = bodyParser(note.body);
+	const colors = JSON.parse(note.colors);
 	let mouseStartPos = { x: 0, y: 0 };
 
 	useEffect(() => {
@@ -21,13 +20,15 @@ const NoteCard = ({ note }) => {
 	}, []);
 
 	const mouseDown = (e) => {
-		mouseStartPos.x = e.clientX;
-		mouseStartPos.y = e.clientY;
+		if (e.target.className === 'card-header') {
+			mouseStartPos.x = e.clientX;
+			mouseStartPos.y = e.clientY;
 
-		document.addEventListener('mousemove', mouseMove);
-		document.addEventListener('mouseup', mouseUp);
+			document.addEventListener('mousemove', mouseMove);
+			document.addEventListener('mouseup', mouseUp);
 
-		setZIndex(cardRef.current);
+			setZIndex(cardRef.current);
+		}
 	};
 
 	const mouseMove = (e) => {
@@ -39,7 +40,6 @@ const NoteCard = ({ note }) => {
 		// update mouse move start position for next move
 		mouseStartPos.x = e.clientX;
 		mouseStartPos.y = e.clientY;
-
 		// set new position for the card
 		const newPosition = setNewOffset(cardRef.current, mouseMoveDir);
 		setPosition(newPosition);
@@ -89,7 +89,7 @@ const NoteCard = ({ note }) => {
 				style={{ backgroundColor: colors.colorHeader }}
 				onMouseDown={mouseDown}
 			>
-				<TrashIcon />
+				<DeleteButton noteId={note.$id} setNotes={setNotes} />
 				{saving && (
 					<div className="card-saving">
 						<Spinner color={colors.colorText} />
