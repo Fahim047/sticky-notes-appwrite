@@ -1,10 +1,11 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useContext } from 'react';
 import { autoGrow, bodyParser, setNewOffset, setZIndex } from '../utils';
 import { db } from '../appwrite/databases';
 import Spinner from '../icons/Spinner';
 import DeleteButton from './DeleteButton';
+import { NoteContext } from '../context/NoteContext';
 
-const NoteCard = ({ note, setNotes }) => {
+const NoteCard = ({ note }) => {
 	const [saving, setSaving] = useState(false);
 	const keyUpTimer = useRef(null);
 	const [position, setPosition] = useState(JSON.parse(note.position));
@@ -17,7 +18,10 @@ const NoteCard = ({ note, setNotes }) => {
 
 	useEffect(() => {
 		autoGrow(textAreaRef);
+		setZIndex(cardRef.current);
 	}, []);
+
+	const { setSelectedNote } = useContext(NoteContext);
 
 	const mouseDown = (e) => {
 		if (e.target.className === 'card-header') {
@@ -28,6 +32,7 @@ const NoteCard = ({ note, setNotes }) => {
 			document.addEventListener('mouseup', mouseUp);
 
 			setZIndex(cardRef.current);
+			setSelectedNote(note);
 		}
 	};
 
@@ -89,7 +94,7 @@ const NoteCard = ({ note, setNotes }) => {
 				style={{ backgroundColor: colors.colorHeader }}
 				onMouseDown={mouseDown}
 			>
-				<DeleteButton noteId={note.$id} setNotes={setNotes} />
+				<DeleteButton noteId={note.$id} />
 				{saving && (
 					<div className="card-saving">
 						<Spinner color={colors.colorText} />
@@ -105,7 +110,9 @@ const NoteCard = ({ note, setNotes }) => {
 					style={{ color: colors.colorText }}
 					defaultValue={body}
 					onInput={() => autoGrow(textAreaRef)}
-					onFocus={() => setZIndex(cardRef.current)}
+					onFocus={() => {
+						setZIndex(cardRef.current), setSelectedNote(note);
+					}}
 					onKeyUp={handleKeyUp}
 				></textarea>
 			</div>
